@@ -1,0 +1,23 @@
+/* Mengatur ulang beberapa gaya dasar browser */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+/* Menerapkan font Poppins ke seluruh aplikasi */
+body, html {
+  font-family: 'Poppins', sans-serif;
+  background-color: #f4f7f6; /* Warna latar belakang dasar */
+}
+
+/* Memberikan transisi halus untuk semua tombol */
+button {
+  transition: all 0.2s ease-in-out;
+}
+
+/* Efek saat tombol ditekan */
+button:active {
+  transform: scale(0.97);
+  opacity: 0.9;
+}
