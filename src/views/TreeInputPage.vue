@@ -1,12 +1,12 @@
 <script setup lang="ts">
-import { ref } from 'vue';
+import { ref, computed } from 'vue';
 import { useRouter } from 'vue-router';
 import { useCalculatorStore, Equation } from '@/store/calculator';
 
 const router = useRouter();
 const store = useCalculatorStore();
 
-// Grup "Lainnya" yang berisi Chave dihapus
+// Mengembalikan semua grup rumus
 const equationGroups = ref([
   {
     label: 'Spesifik Spesies',
@@ -19,6 +19,11 @@ const equationGroups = ref([
     ],
   },
 ]);
+
+// Fungsi ini akan mengecek apakah rumus membutuhkan input tinggi
+const needsHeight = computed(() => (equation: Equation) => {
+  return equation === Equation.BrownWet;
+});
 
 const getClimateName = (climate: Equation) => {
     switch (climate) {
@@ -59,7 +64,7 @@ const goBack = () => {
              <input type="text" v-model="tree.name">
            </div>
            <div class="input-group">
-             <label>Spesies Pohon (untuk API)</label>
+             <label>Spesies Pohon</label>
              <input type="text" v-model="tree.species">
            </div>
            <div class="input-group">
@@ -80,7 +85,7 @@ const goBack = () => {
              <input type="number" v-model.number="tree.circumference">
            </div>
            
-           <div v-if="tree.selectedEquation === Equation.BrownWet" class="input-group">
+           <div v-if="needsHeight(tree.selectedEquation)" class="input-group">
              <label>Tinggi Pohon (m)*</label>
              <input type="number" v-model.number="tree.height">
            </div>
@@ -95,7 +100,7 @@ const goBack = () => {
 </template>
 
 <style scoped>
-/* Style tetap sama seperti sebelumnya */
+/* Style tidak berubah */
 .page-wrapper {
   background-image: url('@/assets/images/forest_background.jpg');
   background-size: cover; background-position: center; min-height: 100vh;

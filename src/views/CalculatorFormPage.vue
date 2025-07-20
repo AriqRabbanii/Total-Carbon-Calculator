@@ -61,7 +61,7 @@ const goBack = () => {
 
       <div class="form-card">
         <form @submit.prevent="handleNext">
-          <h2>1. Pendataan Wilayah & Metode</h2>
+          <h2>Pendataan Wilayah & Metode</h2>
           <hr>
 
           <div class="form-grid">

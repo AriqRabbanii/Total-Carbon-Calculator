@@ -58,6 +58,9 @@ const calculationDate = computed(() => {
 
             <div class="info-label">Tanggal</div>
             <div class="info-value">: {{ calculationDate }}</div>
+
+            <div class="info-label">Metode</div>
+            <div class="info-value">: {{ store.projectData.selectedMethod }}</div>
           </div>
 
           <hr class="divider">
@@ -87,6 +90,7 @@ const calculationDate = computed(() => {
                 <tr>
                   <th>No</th>
                   <th>Nama Pohon</th>
+                  <th>Spesies</th>
                   <th>Keliling (cm)</th>
                   <th>AGB (kg)</th>
                 </tr>
@@ -95,6 +99,7 @@ const calculationDate = computed(() => {
                 <tr v-for="(tree, index) in store.results.detailedTreeResults" :key="index">
                   <td>{{ index + 1 }}</td>
                   <td>{{ tree.name }}</td>
+                  <td>{{ tree.species }}</td>
                   <td>{{ tree.circumference.toFixed(1) }}</td>
                   <td>{{ tree.agb.toFixed(2) }}</td>
                 </tr>
@@ -141,15 +146,23 @@ h2 { font-size: 20px; margin-bottom: 24px; color: #333; font-weight: bold; }
   gap: 8px 16px;
   color: #333;
 }
-.info-label { color: #555; }
+.info-label { color: #555; text-transform: capitalize; }
+.info-value { font-weight: bold; }
 
 .divider { border: 0; border-top: 1px solid #e0e0e0; margin: 24px 0; }
 
+/* === PERBAIKAN DI SINI === */
 .metric-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
+  display: flex;
+  justify-content: space-between;
   gap: 24px;
 }
+
+.metric {
+  flex: 1; /* Memberi lebar yang sama pada setiap item metric */
+}
+/* ======================== */
+
 .metric label { font-size: 16px; color: #555; }
 .metric p {
   font-size: 32px; font-weight: bold; color: #2C8A4A; margin: 4px 0 0 0;

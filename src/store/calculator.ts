@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia';
 
-// Definisikan tipe data agar lebih terstruktur
+// Mengembalikan semua rumus dari lampiran, kecuali Chave
 export enum Equation {
   BrownDry = 'BrownDry',
   BrownMoist = 'BrownMoist',
@@ -10,7 +10,6 @@ export enum Equation {
   SwieteniaMacrophylla = 'SwieteniaMacrophylla',
   MangiferaIndica = 'MangiferaIndica',
   AcaciaMangium = 'AcaciaMangium',
-  // Rumus Chave dihapus dari enum
 }
 
 export interface ProjectData {
@@ -30,7 +29,6 @@ export interface Tree {
   species: string;
   circumference: number; // in cm
   height?: number; // in m, optional
-  woodDensity?: number; // in g/cm³, optional
   selectedEquation: Equation;
 }
 
@@ -72,16 +70,15 @@ export const useCalculatorStore = defineStore('calculator', {
     calculateResults() {
       if (!this.projectData || this.trees.length === 0) return;
 
-      let totalBiomassKg = 0;
       let totalCarbonKg = 0;
       const detailedTreeResults = [];
 
       for (const tree of this.trees) {
         if (tree.circumference <= 0) continue;
+        
         const diameterCm = tree.circumference / Math.PI;
 
-        let biomassKg = 0;
-        // Kasus untuk Chave dihapus dari switch
+        let biomassKg = 0; // Ini adalah AGB (Above Ground Biomass)
         switch (tree.selectedEquation) {
             case Equation.BrownDry: biomassKg = 0.139 * Math.pow(diameterCm, 2.32); break;
             case Equation.BrownMoist: biomassKg = 0.118 * Math.pow(diameterCm, 2.53); break;
@@ -93,27 +90,34 @@ export const useCalculatorStore = defineStore('calculator', {
             case Equation.AcaciaMangium: biomassKg = 0.109 * Math.pow(diameterCm, 2.587); break;
         }
 
-        const agbKg = biomassKg;
-        const bgbKg = agbKg * 0.26;
-        const carbonKg = (agbKg + bgbKg) * 0.47;
+        // Perhitungan BGB (Below Ground Biomass)
+        const bgbKg = biomassKg * 0.26;
+        
+        // Perhitungan Total Biomassa per Pohon
+        const totalBiomassPerTree = biomassKg + bgbKg;
 
-        totalBiomassKg += agbKg;
+        // Perhitungan Karbon per Pohon
+        const carbonKg = totalBiomassPerTree * 0.47;
+
         totalCarbonKg += carbonKg;
 
         detailedTreeResults.push({
           name: tree.name || `Pohon #${tree.id.toFixed(0)}`,
+          species: tree.species || 'N/A',
           circumference: tree.circumference,
-          equation: tree.selectedEquation,
-          agb: agbKg,
+          agb: biomassKg,
         });
       }
-
-      let totalBiomassPerHa = 0;
-      let totalCarbonPerHa = 0;
+      
       const luasAreaHa = this.projectData.luasArea;
+      // Menghitung Total Biomassa Keseluruhan (AGB+BGB) dari total karbon
+      const totalBiomassAllTreesKg = totalCarbonKg / 0.47;
+
+      let totalBiomassPerHa = 0; // Ton/Ha
+      let totalCarbonPerHa = 0; // Ton/Ha
 
       if (this.projectData.selectedMethod === 'sensus' && luasAreaHa > 0) {
-        totalBiomassPerHa = (totalBiomassKg / 1000) / luasAreaHa;
+        totalBiomassPerHa = (totalBiomassAllTreesKg / 1000) / luasAreaHa;
         totalCarbonPerHa = (totalCarbonKg / 1000) / luasAreaHa;
       }
       
